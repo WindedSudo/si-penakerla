@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Notifikasi{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <h2 class="mb-0"><i class="bi bi-bell me-2"></i>Notifikasi</h2>
+    <div class="d-flex gap-2 flex-wrap">
+        <!-- Filter Kategori -->
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-funnel me-1"></i>
+                {% if current_kategori %}{{ kategori_map.get(current_kategori, current_kategori) }}{% else %}Semua Kategori{% endif %}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li><a class="dropdown-item {% if not current_kategori %}active{% endif %}" href="{{ url_for('auth.notifikasi') }}">Semua Kategori</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item {% if current_kategori == 'lamaran' %}active{% endif %}" href="{{ url_for('auth.notifikasi', kategori='lamaran') }}">
+                    <i class="bi bi-file-earmark-text me-2 text-primary"></i>Lamaran</a></li>
+                <li><a class="dropdown-item {% if current_kategori == 'lowongan' %}active{% endif %}" href="{{ url_for('auth.notifikasi', kategori='lowongan') }}">
+                    <i class="bi bi-briefcase me-2 text-success"></i>Lowongan</a></li>
+                <li><a class="dropdown-item {% if current_kategori == 'verifikasi' %}active{% endif %}" href="{{ url_for('auth.notifikasi', kategori='verifikasi') }}">
+                    <i class="bi bi-patch-check me-2 text-warning"></i>Verifikasi</a></li>
+                <li><a class="dropdown-item {% if current_kategori == 'sistem' %}active{% endif %}" href="{{ url_for('auth.notifikasi', kategori='sistem') }}">
+                    <i class="bi bi-gear me-2 text-secondary"></i>Sistem</a></li>
+            </ul>
+        </div>
+        {% if notif_list %}
+        <form method="POST" action="{{ url_for('auth.notifikasi_baca_semua') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-check2-all me-1"></i>Tandai Semua Dibaca
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+{% if notif_list %}
+<div class="list-group shadow-sm">
+    {% for n in notif_list %}
+    <a href="{{ url_for('auth.notifikasi_baca', id=n.id) }}" 
+       class="list-group-item list-group-item-action {% if not n.dibaca %}border-start border-primary border-4 bg-light{% endif %} py-3">
+        <div class="d-flex w-100 justify-content-between align-items-start">
+            <div class="d-flex gap-3 align-items-start">
+                <!-- Icon kategori -->
+                <div class="d-none d-sm-block mt-1">
+                    {% if n.kategori == 'lamaran' %}
+                    <div class="rounded-circle bg-primary bg-opacity-10 p-2"><i class="bi bi-file-earmark-text text-primary"></i></div>
+                    {% elif n.kategori == 'lowongan' %}
+                    <div class="rounded-circle bg-success bg-opacity-10 p-2"><i class="bi bi-briefcase text-success"></i></div>
+                    {% elif n.kategori == 'verifikasi' %}
+                    <div class="rounded-circle bg-warning bg-opacity-10 p-2"><i class="bi bi-patch-check text-warning"></i></div>
+                    {% else %}
+                    <div class="rounded-circle bg-secondary bg-opacity-10 p-2"><i class="bi bi-bell text-secondary"></i></div>
+                    {% endif %}
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                        {% if not n.dibaca %}
+                        <span class="badge bg-primary" style="font-size:0.6rem;">BARU</span>
+                        {% endif %}
+                        <h6 class="mb-0 fw-semibold {% if not n.dibaca %}text-primary{% endif %}">{{ n.judul }}</h6>
+                    </div>
+                    <p class="mb-0 text-muted small">{{ n.pesan }}</p>
+                    {% if n.kategori %}
+                    <span class="badge bg-light text-dark mt-1" style="font-size:0.65rem;">{{ kategori_map.get(n.kategori, n.kategori) }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <small class="text-muted text-nowrap ms-3">
+                {% if n.created_at %}
+                {{ n.created_at.strftime('%d %b, %H:%M') }}
+                {% endif %}
+            </small>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="bi bi-bell-slash text-muted" style="font-size:3rem;"></i>
+    <p class="text-muted mt-3">
+        {% if current_kategori %}Tidak ada notifikasi untuk kategori ini.{% else %}Belum ada notifikasi.{% endif %}
+    </p>
+</div>
+{% endif %}
+{% endblock %}

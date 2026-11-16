@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Monitoring Lowongan{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2>Monitoring Lowongan</h2>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">No</th>
+                        <th>Posisi</th>
+                        <th>Perusahaan</th>
+                        <th>Lokasi</th>
+                        <th>Gaji</th>
+                        <th>Kebutuhan</th>
+                        <th>Deadline</th>
+                        <th class="pe-3">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in lowongan_list %}
+                    <tr>
+                        <td class="ps-3">{{ loop.index }}</td>
+                        <td>{{ l.posisi }}</td>
+                        <td>{{ l.nama_perusahaan }}</td>
+                        <td>{{ l.lokasi }}</td>
+                        <td>Rp {{ "{:,.0f}".format(l.gaji).replace(',', '.') }}</td>
+                        <td>{{ l.jumlah_kebutuhan }}</td>
+                        <td>{{ l.deadline }}</td>
+                        <td class="pe-3">
+                            {% if l.status == 'aktif' %}
+                            <span class="badge bg-success">Aktif</span>
+                            {% elif l.status == 'draft' %}
+                            <span class="badge bg-secondary">Draft</span>
+                            {% elif l.status == 'ditutup' %}
+                            <span class="badge bg-danger">Ditutup</span>
+                            {% else %}
+                            <span class="badge bg-warning">{{ l.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">Tidak ada data lowongan.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV - {{ user.nama }} | SI-PENAKERLA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; color: #333; background: #f0f0f0; }
+        
+        .cv-page {
+            width: 210mm; min-height: 297mm;
+            margin: 20px auto; background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 0;
+        }
+        
+        .cv-header {
+            background: linear-gradient(135deg, #0a2f6b, #1565c0);
+            color: white; padding: 40px 45px 30px;
+        }
+        .cv-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; letter-spacing: 0.5px; }
+        .cv-header .subtitle { font-size: 14px; opacity: 0.85; font-weight: 300; }
+        .cv-contact { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 15px; font-size: 13px; }
+        .cv-contact span { display: flex; align-items: center; gap: 6px; opacity: 0.9; }
+        .cv-contact .dot { width: 6px; height: 6px; background: #64b5f6; border-radius: 50%; }
+        
+        .cv-body { padding: 35px 45px; }
+        
+        .cv-section { margin-bottom: 28px; }
+        .cv-section-title {
+            font-size: 15px; font-weight: 700; color: #0a2f6b;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            border-bottom: 2px solid #0a2f6b; padding-bottom: 6px;
+            margin-bottom: 14px;
+        }
+        
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 30px; }
+        .info-item { display: flex; gap: 8px; font-size: 13px; }
+        .info-label { color: #777; min-width: 110px; }
+        .info-value { font-weight: 500; }
+        
+        .skill-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .skill-tag {
+            background: #e3f2fd; color: #0d47a1;
+            padding: 4px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 500;
+        }
+        
+        .exp-item { margin-bottom: 18px; padding-left: 18px; border-left: 3px solid #1565c0; }
+        .exp-item:last-child { margin-bottom: 0; }
+        .exp-header { display: flex; justify-content: space-between; align-items: baseline; }
+        .exp-position { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+        .exp-period { font-size: 12px; color: #888; font-weight: 500; }
+        .exp-company { font-size: 13px; color: #555; margin-top: 2px; }
+        .exp-desc { font-size: 12px; color: #666; margin-top: 6px; line-height: 1.6; }
+        
+        .print-bar {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: #0a2f6b; color: white; padding: 12px 20px;
+            display: flex; justify-content: center; gap: 15px; align-items: center;
+            z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .print-bar button {
+            background: white; color: #0a2f6b; border: none;
+            padding: 8px 24px; border-radius: 6px;
+            font-weight: 600; cursor: pointer; font-size: 14px;
+        }
+        .print-bar button:hover { background: #e3f2fd; }
+        .print-bar a {
+            color: white; text-decoration: none; opacity: 0.8;
+            font-size: 14px;
+        }
+        .print-bar a:hover { opacity: 1; }
+        
+        @media print {
+            body { background: white; }
+            .cv-page { margin: 0; box-shadow: none; width: 100%; }
+            .print-bar { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="print-bar">
+        <span>CV {{ user.nama }}</span>
+        <button onclick="window.print()">🖨️ Cetak / Download PDF</button>
+        {% if back_url %}
+        <a href="{{ back_url }}">← Kembali</a>
+        {% else %}
+        <a href="#" onclick="window.close(); return false;">✕ Tutup Tab</a>
+        {% endif %}
+    </div>
+
+    <div class="cv-page" style="margin-top: 70px;">
+        <div class="cv-header">
+            <h1>{{ user.nama }}</h1>
+            {% if pencari_kerja.pendidikan %}
+            <div class="subtitle">{{ pencari_kerja.pendidikan }}{% if pengalaman_list %} • {{ pengalaman_list[0].posisi }}{% endif %}</div>
+            {% endif %}
+            <div class="cv-contact">
+                <span><span class="dot"></span>{{ user.email }}</span>
+                {% if pencari_kerja.alamat %}
+                <span><span class="dot"></span>{{ pencari_kerja.kecamatan }}, Lamongan</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="cv-body">
+            {% if pencari_kerja %}
+            <div class="cv-section">
+                <div class="cv-section-title">Informasi Pribadi</div>
+                <div class="info-grid">
+                    {% if pencari_kerja.nik %}
+                    <div class="info-item"><span class="info-label">NIK</span><span class="info-value">{{ pencari_kerja.nik }}</span></div>
+                    {% endif %}
+                    {% if pencari_kerja.tanggal_lahir %}
+                    <div class="info-item"><span class="info-label">Tanggal Lahir</span><span class="info-value">{{ pencari_kerja.tanggal_lahir.strftime('%d %B %Y') if pencari_kerja.tanggal_lahir else '-' }}</span></div>
+                    {% endif %}
+                    {% if pencari_kerja.jenis_kelamin %}
+                    <div class="info-item"><span class="info-label">Jenis Kelamin</span><span class="info-value">{{ pencari_kerja.jenis_kelamin }}</span></div>
+                    {% endif %}
+                    {% if pencari_kerja.alamat %}
+                    <div class="info-item"><span class="info-label">Alamat</span><span class="info-value">{{ pencari_kerja.alamat }}, {{ pencari_kerja.kecamatan }}</span></div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if pencari_kerja.pendidikan %}
+            <div class="cv-section">
+                <div class="cv-section-title">Pendidikan</div>
+                <div class="exp-item">
+                    <div class="exp-position">{{ pencari_kerja.pendidikan }}</div>
+                    <div class="exp-company">Kabupaten Lamongan, Jawa Timur</div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if pencari_kerja.keterampilan %}
+            <div class="cv-section">
+                <div class="cv-section-title">Keterampilan</div>
+                <div class="skill-tags">
+                    {% for skill in pencari_kerja.keterampilan.split(',') %}
+                    <span class="skill-tag">{{ skill.strip() }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if keahlian_list|default([]) %}
+            <div class="cv-section">
+                <div class="cv-section-title">Keahlian Spesifik</div>
+                <div class="skill-tags">
+                    {% for item in keahlian_list|default([]) %}
+                    <span class="skill-tag">{{ item.nama_skill }} · {{ item.tingkat }} · {{ item.pengalaman_tahun }} tahun</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if pengalaman_list %}
+            <div class="cv-section">
+                <div class="cv-section-title">Pengalaman Kerja</div>
+                {% for p in pengalaman_list %}
+                <div class="exp-item">
+                    <div class="exp-header">
+                        <span class="exp-position">{{ p.posisi }}</span>
+                        <span class="exp-period">{{ p.tahun_mulai }} - {{ p.tahun_selesai or 'Sekarang' }}</span>
+                    </div>
+                    <div class="exp-company">{{ p.nama_perusahaan }}</div>
+                    {% if p.deskripsi %}
+                    <div class="exp-desc">{{ p.deskripsi }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if portofolio_list|default([]) %}
+            <div class="cv-section">
+                <div class="cv-section-title">Portofolio / Proyek</div>
+                {% for item in portofolio_list|default([]) %}
+                <div class="exp-item">
+                    <div class="exp-header"><span class="exp-position">{{ item.judul }}</span><span class="exp-period">{{ item.tahun or '' }}</span></div>
+                    {% if item.deskripsi %}<div class="exp-desc">{{ item.deskripsi }}</div>{% endif %}
+                    {% if item.tautan %}<div class="exp-desc">Tautan: <a href="{{ item.tautan }}" target="_blank" rel="noopener noreferrer">{{ item.tautan }}</a></div>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div style="margin-top: 40px; padding-top: 15px; border-top: 1px solid #eee; text-align: center;">
+                <p style="font-size: 11px; color: #aaa;">CV dibuat melalui SI-PENAKERLA • Sistem Informasi Pendataan dan Penempatan Tenaga Kerja Kabupaten Lamongan</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Monitoring Penempatan{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2>Monitoring Penempatan</h2>
+</div>
+
+<ul class="nav nav-pills mb-4">
+    <li class="nav-item">
+        <a class="nav-link {% if not current_status %}active{% endif %}" href="{{ url_for('admin.penempatan') }}">Semua</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if current_status == 'aktif' %}active{% endif %}" href="{{ url_for('admin.penempatan', status='aktif') }}">Aktif</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if current_status == 'selesai' %}active{% endif %}" href="{{ url_for('admin.penempatan', status='selesai') }}">Selesai</a>
+    </li>
+</ul>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">No</th>
+                        <th>Pencari Kerja</th>
+                        <th>Posisi</th>
+                        <th>Perusahaan</th>
+                        <th>Tanggal Penempatan</th>
+                        <th class="pe-3">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in penempatan_list %}
+                    <tr>
+                        <td class="ps-3">{{ loop.index }}</td>
+                        <td>{{ p.nama_pelamar }}</td>
+                        <td>{{ p.posisi }}</td>
+                        <td>{{ p.nama_perusahaan }}</td>
+                        <td>{{ p.tanggal_penempatan }}</td>
+                        <td class="pe-3">
+                            {% if p.status == 'aktif' %}
+                            <span class="badge bg-success">Aktif</span>
+                            {% elif p.status == 'selesai' %}
+                            <span class="badge bg-secondary">Selesai</span>
+                            {% else %}
+                            <span class="badge bg-info">{{ p.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">Tidak ada data penempatan.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

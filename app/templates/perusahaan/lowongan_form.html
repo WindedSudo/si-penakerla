@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if mode == 'edit' else 'Tambah' }} Lowongan{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2>{{ 'Edit Lowongan' if mode == 'edit' else 'Tambah Lowongan' }}</h2>
+</div>
+
+<div class="card shadow-sm max-w-4xl">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('perusahaan.lowongan_edit', id=lowongan.id) if mode == 'edit' else url_for('perusahaan.lowongan_tambah') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="mb-3">
+                <label for="posisi" class="form-label">Posisi Pekerjaan</label>
+                <input type="text" class="form-control" id="posisi" name="posisi" value="{{ lowongan.posisi if mode == 'edit' else '' }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="deskripsi" class="form-label">Deskripsi Pekerjaan</label>
+                <textarea class="form-control" id="deskripsi" name="deskripsi" rows="6" required>{{ lowongan.deskripsi if mode == 'edit' else '' }}</textarea>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label d-block">Pendidikan yang Diterima</label>
+                    {% for p in pendidikan_options %}
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="pendidikan" id="pend_{{ loop.index }}" value="{{ p }}" {% if p in pendidikan_terpilih %}checked{% endif %}>
+                        <label class="form-check-label" for="pend_{{ loop.index }}">{{ p }}</label>
+                    </div>
+                    {% endfor %}
+                    <div class="form-text">Pilih semua jenjang yang boleh melamar (minimal satu).</div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="lokasi" class="form-label">Lokasi Penempatan</label>
+                    <input type="text" class="form-control" id="lokasi" name="lokasi" value="{{ lowongan.lokasi if mode == 'edit' else '' }}" required>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="gaji" class="form-label">Perkiraan Gaji (Rp)</label>
+                    <input type="number" class="form-control" id="gaji" name="gaji" value="{{ lowongan.gaji if mode == 'edit' else '' }}" required>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="jumlah_kebutuhan" class="form-label">Jumlah Kebutuhan Pekerja</label>
+                    <input type="number" class="form-control" id="jumlah_kebutuhan" name="jumlah_kebutuhan" min="1" value="{{ lowongan.jumlah_kebutuhan if mode == 'edit' else '1' }}" required>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="status" class="form-label">Status Lowongan</label>
+                    <select class="form-select" id="status" name="status" required>
+                        <option value="draft" {% if mode == 'edit' and lowongan.status == 'draft' %}selected{% endif %}>Draft</option>
+                        <option value="aktif" {% if mode == 'edit' and lowongan.status == 'aktif' %}selected{% endif %}>Aktif</option>
+                        <option value="ditutup" {% if mode == 'edit' and lowongan.status == 'ditutup' %}selected{% endif %}>Ditutup</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="deadline" class="form-label">Batas Akhir Lamaran (Deadline)</label>
+                    <input type="date" class="form-control" id="deadline" name="deadline" min="{{ today }}" value="{{ lowongan.deadline if mode == 'edit' else '' }}" required>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Simpan</button>
+                <a href="{{ url_for('perusahaan.lowongan_list') }}" class="btn btn-secondary">Batal</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

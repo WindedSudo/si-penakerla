@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Detail Lowongan - {{ lowongan.posisi }}{% endblock %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="mb-3">
+        <a href="{{ url_for('pencari.lowongan') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar Lowongan
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h3 class="card-title fw-bold mb-0">{{ lowongan.posisi }}</h3>
+                        {% if lowongan.status == 'aktif' %}
+                        <span class="badge bg-success fs-6">Aktif</span>
+                        {% else %}
+                        <span class="badge bg-secondary fs-6">Tutup</span>
+                        {% endif %}
+                    </div>
+                    
+                    <h5 class="text-primary mb-3">{{ lowongan.nama_perusahaan }}</h5>
+                    
+                    {% if match_score > 0 %}
+                    <div class="card border-0 bg-light mb-4 p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-semibold"><i class="bi bi-bullseye me-1"></i>Skor Kecocokan</span>
+                            <span class="fw-bold fs-5 {% if match_score >= 70 %}text-success{% elif match_score >= 40 %}text-warning{% else %}text-secondary{% endif %}">{{ match_score }}%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar {% if match_score >= 70 %}bg-success{% elif match_score >= 40 %}bg-warning{% else %}bg-secondary{% endif %}" 
+                                 role="progressbar" style="width: {{ match_score }}%"></div>
+                        </div>
+                        <div class="row g-2 small mt-2">
+                            <div class="col-6">Pendidikan <strong>{{ match_breakdown.pendidikan }}/30</strong></div>
+                            <div class="col-6">Skill <strong>{{ match_breakdown.skill }}/45</strong></div>
+                            <div class="col-6">Lokasi <strong>{{ match_breakdown.lokasi }}/15</strong></div>
+                            <div class="col-6">Pengalaman <strong>{{ match_breakdown.pengalaman }}/10</strong></div>
+                        </div>
+                        {% if match_breakdown.reasons %}<ul class="small text-muted mt-2 mb-0">{% for reason in match_breakdown.reasons %}<li>{{ reason }}</li>{% endfor %}</ul>{% endif %}
+                        <small class="text-muted d-block mt-2">Skor merupakan estimasi berbasis aturan, bukan jaminan diterima kerja.</small>
+                    </div>
+                    {% endif %}
+                    
+                    <h6 class="fw-bold border-bottom pb-2 mb-3">Deskripsi Pekerjaan</h6>
+                    <div class="mb-4 text-justify" style="white-space: pre-line;">
+                        {{ lowongan.deskripsi }}
+                    </div>
+                    
+                    <h6 class="fw-bold border-bottom pb-2 mb-3">Informasi Tambahan</h6>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 text-muted">Pendidikan yang Diterima</div>
+                        <div class="col-sm-8 fw-bold">{{ lowongan.pendidikan.replace(',', ', ') }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 text-muted">Lokasi Penempatan</div>
+                        <div class="col-sm-8 fw-bold">{{ lowongan.lokasi }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 text-muted">Gaji yang Ditawarkan</div>
+                        <div class="col-sm-8 fw-bold">
+                            {% if lowongan.gaji %}
+                                Rp {{ "{:,.0f}".format(lowongan.gaji).replace(',', '.') }}
+                            {% else %}
+                                Negosiasi
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 text-muted">Jumlah Kebutuhan</div>
+                        <div class="col-sm-8 fw-bold">{{ lowongan.jumlah_kebutuhan }} orang</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 text-muted">Batas Waktu Melamar</div>
+                        <div class="col-sm-8 fw-bold text-danger">
+                            {{ lowongan.deadline.strftime('%d %B %Y') if lowongan.deadline else 'Tidak ditentukan' }}
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 text-muted">Jumlah Pelamar</div>
+                        <div class="col-sm-8 fw-bold">{{ jumlah_pelamar }} orang</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm sticky-top" style="top: 20px; z-index: 1;">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 text-center">Tindakan</h5>
+                </div>
+                <div class="card-body text-center p-4">
+                    {% if is_applied %}
+                        <div class="alert alert-success mb-0" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i> Anda sudah melamar lowongan ini
+                        </div>
+                        <a href="{{ url_for('pencari.lamaran') }}" class="btn btn-outline-primary w-100 mt-3">Lihat Status Lamaran</a>
+                    {% else %}
+                        {% if lowongan.status == 'aktif' and not deadline_passed %}
+                            {% if not profile_complete %}
+                                <div class="alert alert-warning mb-3 text-start small" role="alert">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i> Profil belum lengkap.
+                                </div>
+                                <a href="{{ url_for('pencari.profile') }}" class="btn btn-warning w-100 mb-2">Lengkapi Profil</a>
+                            {% else %}
+                                <form method="POST" action="{{ url_for('pencari.lamar', lowongan_id=lowongan.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <p class="small text-muted mb-3 text-start">Dengan menekan tombol Lamar, profil dan CV Anda akan dikirimkan ke perusahaan.</p>
+                                    <button type="submit" class="btn btn-primary w-100 py-2 fs-5" onclick="return confirm('Apakah Anda yakin ingin melamar lowongan ini?')">
+                                        <i class="bi bi-send me-2"></i>Lamar Sekarang
+                                    </button>
+                                </form>
+                            {% endif %}
+                        {% elif deadline_passed %}
+                            <div class="alert alert-danger mb-0" role="alert">
+                                <i class="bi bi-x-circle-fill me-2"></i> Deadline telah terlewat
+                            </div>
+                        {% else %}
+                            <div class="alert alert-secondary mb-0" role="alert">
+                                <i class="bi bi-info-circle-fill me-2"></i> Lowongan sudah ditutup
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Daftar - SI-PENAKERLA{% endblock %}
+
+{% block content %}
+<div class="auth-container d-flex justify-content-center align-items-center">
+    <div class="auth-card card shadow-sm" style="width: 100%; max-width: 500px; border: none; border-radius: 12px; overflow: hidden;">
+        <div class="auth-header">
+            <i class="bi bi-person-plus fs-1 mb-2"></i>
+            <h3 class="mb-1">Buat Akun Baru</h3>
+            <p class="mb-0 small opacity-75">Daftar untuk menggunakan SI-PENAKERLA</p>
+        </div>
+        <div class="card-body p-4">
+            <form method="POST" action="{{ url_for('auth.register') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="mb-3">
+                    <label for="nama" class="form-label">Nama Lengkap</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                        <input type="text" class="form-control" id="nama" name="nama" required placeholder="Masukkan nama lengkap">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                        <input type="email" class="form-control" id="email" name="email" required placeholder="Masukkan alamat email">
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                        <input type="password" class="form-control" id="password" name="password" minlength="6" required placeholder="Minimal 6 karakter">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="konfirmasi_password" class="form-label">Konfirmasi Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-shield-lock"></i></span>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required placeholder="Ulangi password">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="role" class="form-label">Mendaftar Sebagai</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-diagram-2"></i></span>
+                        <select class="form-select" id="role" name="role" required>
+                            <option value="" disabled selected>Pilih Peran...</option>
+                            <option value="pencari_kerja">Pencari Kerja</option>
+                            <option value="perusahaan">Perusahaan</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100 mb-3 py-2 fw-semibold">Daftar</button>
+                
+                <div class="text-center small">
+                    Sudah punya akun? <a href="{{ url_for('auth.login') }}" class="text-decoration-none">Masuk di sini</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

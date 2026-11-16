@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Lamaran Saya - SI-PENAKERLA{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4 d-flex justify-content-between align-items-center">
+    <div>
+        <h2>Lamaran Saya</h2>
+        <p class="text-muted">Pantau status lamaran pekerjaan Anda di sini.</p>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-5">
+    <div class="card-body p-0">
+        {% if lamaran_list %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">No</th>
+                        <th>Posisi</th>
+                        <th>Perusahaan</th>
+                        <th>Tanggal Lamaran</th>
+                        <th>Status</th>
+                        <th class="pe-4 text-end">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lamaran in lamaran_list %}
+                    <tr>
+                        <td class="ps-4">{{ loop.index }}</td>
+                        <td><span class="fw-medium">{{ lamaran.posisi }}</span></td>
+                        <td>{{ lamaran.nama_perusahaan }}</td>
+                        <td>{{ lamaran.tanggal_lamaran.strftime('%d %b %Y') if lamaran.tanggal_lamaran else '-' }}</td>
+                        <td>
+                            {% if lamaran.status == 'diajukan' %}
+                            <span class="badge bg-warning text-dark">Diajukan</span>
+                            {% elif lamaran.status == 'diproses' %}
+                            <span class="badge bg-info">Diproses</span>
+                            {% elif lamaran.status == 'diterima' %}
+                            <span class="badge bg-success">Diterima</span>
+                            {% elif lamaran.status == 'ditolak' %}
+                            <span class="badge bg-danger">Ditolak</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ lamaran.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="pe-4 text-end">
+                            <a href="{{ url_for('pencari.lowongan_detail', id=lamaran.lowongan_id) }}" class="btn btn-sm btn-outline-primary">Lihat Lowongan</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state text-center py-5">
+            <i class="bi bi-folder2-open text-muted" style="font-size: 4rem;"></i>
+            <h5 class="mt-3 text-muted">Belum Ada Lamaran</h5>
+            <p class="text-muted">Anda belum melamar pekerjaan apapun. Silakan cari lowongan yang sesuai dengan keahlian Anda.</p>
+            <a href="{{ url_for('pencari.lowongan') }}" class="btn btn-primary mt-2">Cari Lowongan</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if penempatan_list %}
+<h4 class="mb-3">Riwayat Penempatan</h4>
+<div class="row g-4">
+    {% for p in penempatan_list %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 border-top border-3 border-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="card-title fw-bold text-success mb-0">{{ p.posisi_lowongan or p.posisi or '-' }}</h5>
+                    <span class="badge bg-success">Aktif</span>
+                </div>
+                <h6 class="card-subtitle mb-3 text-muted"><i class="bi bi-building me-1"></i>{{ p.nama_perusahaan }}</h6>
+                
+                <div class="d-flex flex-column gap-2 mt-3 text-secondary small">
+                    <div>
+                        <i class="bi bi-calendar-check me-2"></i>
+                        Tanggal Penempatan: <span class="fw-medium text-dark">{{ p.tanggal_penempatan.strftime('%d %b %Y') if p.tanggal_penempatan else '-' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

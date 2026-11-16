@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Admin - SI-PENAKERLA{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <h2>Dashboard Administrator</h2>
+    <p class="text-muted">Ringkasan sistem SI-PENAKERLA</p>
+</div>
+
+<!-- Overview Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-4 border-primary h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase small fw-bold">Total Pengguna</h6>
+                <h3 class="mb-0">{{ stats.total_users }}</h3>
+                <div class="small text-muted mt-1">Pencari: {{ stats.total_pencari }} | Perusahaan: {{ stats.total_perusahaan }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-4 border-success h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase small fw-bold">Perusahaan Terverifikasi</h6>
+                <h3 class="mb-0">{{ stats.perusahaan_terverifikasi }}</h3>
+                <div class="small text-muted mt-1">Dari total {{ stats.total_perusahaan }} perusahaan</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-4 border-info h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase small fw-bold">Total Lowongan</h6>
+                <h3 class="mb-0">{{ stats.total_lowongan }}</h3>
+                <div class="small text-muted mt-1">{{ stats.lowongan_aktif }} Aktif</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-4 border-warning h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase small fw-bold">Total Penempatan</h6>
+                <h3 class="mb-0">{{ stats.total_penempatan }}</h3>
+                <div class="small text-muted mt-1">Dari {{ stats.lamaran_diterima }} lamaran diterima</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Chart Section -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                <h5 class="fw-bold mb-0">Statistik Status Lamaran</h5>
+            </div>
+            <div class="card-body p-4">
+                <canvas id="lamaranChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Links -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                <h5 class="fw-bold mb-0"><i class="bi bi-link-45deg me-2 text-primary"></i>Akses Cepat</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-3">
+                    <a href="{{ url_for('admin.verifikasi') }}" class="btn btn-outline-primary text-start">
+                        <i class="bi bi-building me-2"></i> Verifikasi Perusahaan
+                    </a>
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-outline-primary text-start">
+                        <i class="bi bi-people me-2"></i> Kelola Pengguna
+                    </a>
+                    <a href="{{ url_for('admin.laporan') }}" class="btn btn-outline-primary text-start">
+                        <i class="bi bi-file-earmark-bar-graph me-2"></i> Lihat Laporan
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('lamaranChart').getContext('2d');
+        const lamaranChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Diajukan', 'Diproses', 'Diterima', 'Ditolak'],
+                datasets: [{
+                    label: 'Jumlah Lamaran',
+                    data: [
+                        {{ lamaran_stats.diajukan|default(0) }},
+                        {{ lamaran_stats.diproses|default(0) }},
+                        {{ lamaran_stats.diterima|default(0) }},
+                        {{ lamaran_stats.ditolak|default(0) }}
+                    ],
+                    backgroundColor: [
+                        'rgba(255, 193, 7, 0.7)',
+                        'rgba(13, 202, 240, 0.7)',
+                        'rgba(25, 135, 84, 0.7)',
+                        'rgba(220, 53, 69, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgb(255, 193, 7)',
+                        'rgb(13, 202, 240)',
+                        'rgb(25, 135, 84)',
+                        'rgb(220, 53, 69)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

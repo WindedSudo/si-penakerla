@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Perusahaan - SI-PENAKERLA{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <h2>Dashboard Perusahaan</h2>
+    <p class="text-muted">Selamat datang, {{ perusahaan.nama_perusahaan if perusahaan else current_user.nama }}!</p>
+</div>
+
+{% if perusahaan %}
+    {% if perusahaan.status_verifikasi == 'belum_diverifikasi' %}
+    <div class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Akun perusahaan Anda <strong>belum diverifikasi</strong> oleh Admin. Anda tidak dapat memposting lowongan hingga akun diverifikasi.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% elif perusahaan.status_verifikasi == 'ditolak' %}
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-x-octagon-fill me-2"></i>
+        Verifikasi perusahaan Anda <strong>ditolak</strong>. Silakan hubungi admin untuk informasi lebih lanjut.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+{% else %}
+    <div class="alert alert-warning shadow-sm" role="alert">
+        <i class="bi bi-info-circle me-2"></i>
+        Silakan lengkapi profil perusahaan Anda terlebih dahulu.
+        <a href="{{ url_for('perusahaan.profil') }}" class="alert-link">Lengkapi Profil</a>
+    </div>
+{% endif %}
+
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="stat-card stat-card-primary card h-100 border-0 shadow-sm text-white text-center p-3">
+            <i class="bi bi-briefcase fs-1 mb-2"></i>
+            <h3 class="mb-0 fw-bold">{{ total_lowongan }}</h3>
+            <p class="mb-0">Total Lowongan</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-card-success card h-100 border-0 shadow-sm text-white text-center p-3">
+            <i class="bi bi-briefcase-fill fs-1 mb-2"></i>
+            <h3 class="mb-0 fw-bold">{{ lowongan_aktif }}</h3>
+            <p class="mb-0">Lowongan Aktif</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-card-info card h-100 border-0 shadow-sm text-white text-center p-3">
+            <i class="bi bi-people fs-1 mb-2"></i>
+            <h3 class="mb-0 fw-bold">{{ total_pelamar }}</h3>
+            <p class="mb-0">Total Pelamar</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-card-warning card h-100 border-0 shadow-sm text-white text-center p-3">
+            <i class="bi bi-person-check fs-1 mb-2"></i>
+            <h3 class="mb-0 fw-bold">{{ pelamar_diterima }}</h3>
+            <p class="mb-0">Pelamar Diterima</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                <h5 class="fw-bold mb-0"><i class="bi bi-lightning-charge me-2 text-warning"></i>Akses Cepat</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{{ url_for('perusahaan.lowongan_list') }}" class="btn btn-primary">
+                        <i class="bi bi-list-task me-1"></i> Kelola Lowongan
+                    </a>
+                    <a href="{{ url_for('perusahaan.lowongan_tambah') }}" class="btn btn-success {% if not perusahaan or perusahaan.status_verifikasi != 'terverifikasi' %}disabled{% endif %}">
+                        <i class="bi bi-plus-circle me-1"></i> Buat Lowongan Baru
+                    </a>
+                    <a href="{{ url_for('perusahaan.profil') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-building me-1"></i> Profil Perusahaan
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

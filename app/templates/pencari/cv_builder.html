@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}CV Builder - SI-PENAKERLA{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <h2><i class="bi bi-file-earmark-person me-2"></i>CV Builder</h2>
+    <p class="text-muted">Buat CV profesional Anda secara otomatis dari data profil</p>
+</div>
+
+{% if not profile_complete %}
+<div class="alert alert-warning shadow-sm">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    Profil Anda belum lengkap. <a href="{{ url_for('pencari.profile') }}" class="alert-link">Lengkapi profil</a> terlebih dahulu untuk membuat CV.
+</div>
+{% endif %}
+
+<!-- Data Profil Summary -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>Data Profil</h5>
+            </div>
+            <div class="card-body">
+                {% if pencari_kerja %}
+                <table class="table table-borderless mb-0">
+                    <tr><td class="text-muted" style="width:140px">Nama</td><td class="fw-semibold">{{ current_user.nama }}</td></tr>
+                    <tr><td class="text-muted">Email</td><td>{{ current_user.email }}</td></tr>
+                    <tr><td class="text-muted">NIK</td><td>{{ pencari_kerja.nik or '-' }}</td></tr>
+                    <tr><td class="text-muted">Jenis Kelamin</td><td>{{ pencari_kerja.jenis_kelamin or '-' }}</td></tr>
+                    <tr><td class="text-muted">Alamat</td><td>{{ pencari_kerja.alamat or '-' }}, {{ pencari_kerja.kecamatan or '' }}</td></tr>
+                    <tr><td class="text-muted">Pendidikan</td><td>{{ pencari_kerja.pendidikan or '-' }}</td></tr>
+                    <tr><td class="text-muted">Keterampilan</td><td>{{ pencari_kerja.keterampilan or '-' }}</td></tr>
+                </table>
+                {% else %}
+                <p class="text-muted mb-0">Belum ada data profil.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-briefcase me-2"></i>Pengalaman Kerja</h5>
+                <button class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#modalPengalaman">
+                    <i class="bi bi-plus-lg"></i> Tambah
+                </button>
+            </div>
+            <div class="card-body">
+                {% if pengalaman_list %}
+                <div class="list-group list-group-flush">
+                    {% for p in pengalaman_list %}
+                    <div class="list-group-item px-0 d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="mb-1 fw-bold">{{ p.posisi }}</h6>
+                            <p class="mb-1 text-muted small">{{ p.nama_perusahaan }}</p>
+                            <span class="badge bg-light text-dark">{{ p.tahun_mulai }} - {{ p.tahun_selesai or 'Sekarang' }}</span>
+                            {% if p.deskripsi %}
+                            <p class="mb-0 mt-1 small text-secondary">{{ p.deskripsi[:100] }}{% if p.deskripsi|length > 100 %}...{% endif %}</p>
+                            {% endif %}
+                        </div>
+                        <form method="POST" action="{{ url_for('pencari.pengalaman_hapus', id=p.id) }}" onsubmit="return confirm('Hapus pengalaman ini?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-3">
+                    <i class="bi bi-briefcase text-muted" style="font-size:2rem"></i>
+                    <p class="text-muted mt-2 mb-0">Belum ada pengalaman kerja. Klik "Tambah" untuk menambahkan.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h5 class="fw-bold mb-1">Skill & Portofolio</h5>
+            <p class="text-muted small mb-0">{{ keahlian_list|length }} skill terdaftar · {{ portofolio_list|length }} karya/proyek</p>
+        </div>
+        <a href="{{ url_for('pencari.pengembangan') }}" class="btn btn-outline-primary"><i class="bi bi-stars me-1"></i>Kelola Skill & Portofolio</a>
+    </div>
+</div>
+
+<!-- Generate CV Button -->
+{% if profile_complete %}
+<div class="text-center mb-5">
+    <a href="{{ url_for('pencari.cv_preview') }}" target="_blank" class="btn btn-primary btn-lg px-5 shadow">
+        <i class="bi bi-file-earmark-pdf me-2"></i>Buat & Preview CV
+    </a>
+    <p class="text-muted small mt-2">CV akan dibuka di tab baru. Gunakan Ctrl+P untuk mencetak atau menyimpan sebagai PDF.</p>
+</div>
+{% endif %}
+
+<!-- Modal Tambah Pengalaman -->
+<div class="modal fade" id="modalPengalaman" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('pencari.pengalaman_tambah') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Tambah Pengalaman Kerja</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nama_perusahaan" class="form-label">Nama Perusahaan <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="nama_perusahaan" name="nama_perusahaan" required placeholder="Contoh: PT Teknologi Nusantara">
+                    </div>
+                    <div class="mb-3">
+                        <label for="posisi" class="form-label">Posisi/Jabatan <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="posisi" name="posisi" required placeholder="Contoh: Web Developer">
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="tahun_mulai" class="form-label">Tahun Mulai <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="tahun_mulai" name="tahun_mulai" min="1990" max="2030" required placeholder="2020">
+                        </div>
+                        <div class="col-6">
+                            <label for="tahun_selesai" class="form-label">Tahun Selesai</label>
+                            <input type="number" class="form-control" id="tahun_selesai" name="tahun_selesai" min="1990" max="2030" placeholder="Kosongkan jika masih">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="deskripsi" class="form-label">Deskripsi Pekerjaan</label>
+                        <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Jelaskan tugas dan tanggung jawab Anda..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success"><i class="bi bi-check-lg me-1"></i>Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

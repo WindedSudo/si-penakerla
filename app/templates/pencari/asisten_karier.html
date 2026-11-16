@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Asisten Karier - SI-PENAKERLA{% endblock %}
+{% block content %}
+<div class="page-header mb-4">
+    <h2><i class="bi bi-robot me-2"></i>Asisten Karier</h2>
+    <p class="text-muted">Tanyakan tentang pencarian kerja, skill, CV, portofolio, pencocokan lowongan, atau wawancara.</p>
+</div>
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div id="chatMessages" class="border rounded p-3 mb-3" style="height:420px;overflow-y:auto;background:#f8fafc;" aria-live="polite">
+            <div class="mb-3"><span class="badge bg-primary mb-1">Asisten Karier</span><div class="bg-white border rounded p-3">Halo! Saya dapat membantu kamu mempersiapkan profil, mencari pekerjaan yang cocok, dan menyusun CV. Apa yang ingin kamu bahas?</div></div>
+        </div>
+        <form id="chatForm" class="d-flex gap-2">
+            <input type="hidden" id="csrfToken" value="{{ csrf_token() }}">
+            <input id="chatInput" class="form-control" maxlength="1000" placeholder="Tulis pertanyaan..." autocomplete="off" required>
+            <button id="chatSend" class="btn btn-primary" type="submit"><i class="bi bi-send"></i> Kirim</button>
+        </form>
+        <div class="form-text mt-2">Jangan kirim NIK, kata sandi, OTP, atau data pribadi sensitif. Jawaban asisten adalah panduan, bukan jaminan diterima bekerja.</div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+(() => {
+    const form = document.getElementById('chatForm');
+    const input = document.getElementById('chatInput');
+    const messages = document.getElementById('chatMessages');
+    const send = document.getElementById('chatSend');
+    const token = document.getElementById('csrfToken').value;
+    function addMessage(label, content, user) {
+        const wrap = document.createElement('div');
+        wrap.className = 'mb-3 ' + (user ? 'text-end' : '');
+        const badge = document.createElement('span');
+        badge.className = 'badge ' + (user ? 'bg-secondary' : 'bg-primary') + ' mb-1';
+        badge.textContent = label;
+        const bubble = document.createElement('div');
+        bubble.className = (user ? 'bg-primary text-white ms-auto' : 'bg-white') + ' border rounded p-3';
+        bubble.style.maxWidth = '85%';
+        bubble.style.whiteSpace = 'pre-wrap';
+        bubble.textContent = content;
+        wrap.appendChild(badge); wrap.appendChild(bubble); messages.appendChild(wrap);
+        messages.scrollTop = messages.scrollHeight;
+    }
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const message = input.value.trim();
+        if (!message || send.disabled) return;
+        addMessage('Anda', message, true);
+        input.value = ''; send.disabled = true; send.textContent = 'Mengirim...';
+        try {
+            const response = await fetch('{{ url_for("pencari.api_asisten_karier") }}', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'X-CSRFToken': token},
+                body: JSON.stringify({message})
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Pesan gagal dikirim.');
+            addMessage(data.mode === 'ai' ? 'Asisten AI' : 'Asisten Karier', data.reply, false);
+        } catch (error) {
+            addMessage('Sistem', error.message || 'Terjadi kesalahan. Coba lagi.', false);
+        } finally {
+            send.disabled = false; send.innerHTML = '<i class="bi bi-send"></i> Kirim'; input.focus();
+        }
+    });
+})();
+</script>
+{% endblock %}

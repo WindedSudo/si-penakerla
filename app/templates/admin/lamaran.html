@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Monitoring Lamaran{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2>Monitoring Lamaran</h2>
+</div>
+
+<ul class="nav nav-pills mb-4">
+    <li class="nav-item">
+        <a class="nav-link {% if not current_status %}active{% endif %}" href="{{ url_for('admin.lamaran') }}">Semua</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if current_status == 'diajukan' %}active{% endif %}" href="{{ url_for('admin.lamaran', status='diajukan') }}">Diajukan</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if current_status == 'diproses' %}active{% endif %}" href="{{ url_for('admin.lamaran', status='diproses') }}">Diproses</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if current_status == 'diterima' %}active{% endif %}" href="{{ url_for('admin.lamaran', status='diterima') }}">Diterima</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if current_status == 'ditolak' %}active{% endif %}" href="{{ url_for('admin.lamaran', status='ditolak') }}">Ditolak</a>
+    </li>
+</ul>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">No</th>
+                        <th>Pencari Kerja</th>
+                        <th>Posisi</th>
+                        <th>Perusahaan</th>
+                        <th>Tanggal</th>
+                        <th class="pe-3">Status</th>
+                        <th class="pe-3 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in lamaran_list %}
+                    <tr>
+                        <td class="ps-3">{{ loop.index }}</td>
+                        <td>{{ l.nama_pelamar }}</td>
+                        <td>{{ l.posisi }}</td>
+                        <td>{{ l.nama_perusahaan }}</td>
+                        <td>{{ l.tanggal_lamaran }}</td>
+                        <td class="pe-3">
+                            {% if l.status == 'diajukan' %}
+                            <span class="badge bg-primary">Diajukan</span>
+                            {% elif l.status == 'diproses' %}
+                            <span class="badge bg-warning text-dark">Diproses</span>
+                            {% elif l.status == 'diterima' %}
+                            <span class="badge bg-success">Diterima</span>
+                            {% elif l.status == 'ditolak' %}
+                            <span class="badge bg-danger">Ditolak</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ l.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="pe-3 text-center">
+                            <a href="{{ url_for('admin.lihat_cv', pencari_id=l.pencari_kerja_id) }}" target="_blank" class="btn btn-sm btn-outline-primary" title="Lihat CV">
+                                <i class="bi bi-file-earmark-person"></i> CV
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">Tidak ada data lamaran.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

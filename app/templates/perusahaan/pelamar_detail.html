@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Detail Pelamar{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('perusahaan.pelamar_list', lowongan_id=lowongan.id) }}" class="btn btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i> Kembali ke Daftar Pelamar</a>
+    <h2>Detail Pelamar: {{ lamaran.nama }}</h2>
+    <p class="text-muted">Melamar untuk posisi: <strong>{{ lowongan.posisi }}</strong></p>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Informasi Pelamar</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <th style="width: 30%">Nama Lengkap</th>
+                            <td>: {{ lamaran.nama }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>: {{ lamaran.email }}</td>
+                        </tr>
+                        <tr>
+                            <th>NIK</th>
+                            <td>: {{ lamaran.nik }}</td>
+                        </tr>
+                        <tr>
+                            <th>Pendidikan Terakhir</th>
+                            <td>: {{ lamaran.pendidikan }}</td>
+                        </tr>
+                        <tr>
+                            <th>Keterampilan</th>
+                            <td>: {{ lamaran.keterampilan }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <hr>
+                <h6>Curriculum Vitae (CV)</h6>
+                <p>
+                    <a href="{{ url_for('perusahaan.lihat_cv', pencari_id=lamaran.pencari_kerja_id) }}" target="_blank" class="btn btn-outline-primary">
+                        <i class="bi bi-file-earmark-person me-1"></i> Lihat CV
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Manajemen Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Status Saat Ini:</strong><br>
+                    {% if lamaran.status == 'diajukan' %}
+                    <span class="badge bg-primary fs-6 mt-1">Diajukan</span>
+                    {% elif lamaran.status == 'diproses' %}
+                    <span class="badge bg-warning text-dark fs-6 mt-1">Diproses</span>
+                    {% elif lamaran.status == 'diterima' %}
+                    <span class="badge bg-success fs-6 mt-1">Diterima</span>
+                    {% elif lamaran.status == 'ditolak' %}
+                    <span class="badge bg-danger fs-6 mt-1">Ditolak</span>
+                    {% else %}
+                    <span class="badge bg-secondary fs-6 mt-1">{{ lamaran.status }}</span>
+                    {% endif %}
+                </div>
+                
+                <form method="POST" action="{{ url_for('perusahaan.update_status', lamaran_id=lamaran.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Ubah Status Lamaran</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="diproses" {% if lamaran.status == 'diproses' %}selected{% endif %}>Diproses</option>
+                            <option value="diterima" {% if lamaran.status == 'diterima' %}selected{% endif %}>Diterima</option>
+                            <option value="ditolak" {% if lamaran.status == 'ditolak' %}selected{% endif %}>Ditolak</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Perbarui Status</button>
+                </form>
+            </div>
+        </div>
+
+        {% if penempatan %}
+        <div class="card shadow-sm border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0"><i class="bi bi-check-circle"></i> Info Penempatan</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-1"><strong>Tanggal Penempatan:</strong></p>
+                <p>{{ penempatan.tanggal_penempatan }}</p>
+                <p class="mb-1"><strong>Status Pekerja:</strong></p>
+                <span class="badge bg-success">{{ penempatan.status }}</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

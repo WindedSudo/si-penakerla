@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# File uploads
+uploads/*
+!uploads/.gitkeep
+instance/
+
+# IDEs
+.vscode/
+.idea/
+
+# Hasil pengujian dibuat ulang oleh pytest / tests.eval.run_uji1
+hasil_uji/
+.pytest_cache/

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Laporan{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2>Laporan</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Cetak Laporan</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="reportType" class="form-label">Pilih Jenis Laporan</label>
+                    <select class="form-select" id="reportType">
+                        <option value="pengguna">Data Pengguna</option>
+                        <option value="pencari">Data Pencari Kerja</option>
+                        <option value="perusahaan">Data Perusahaan</option>
+                        <option value="lowongan">Data Lowongan</option>
+                        <option value="lamaran">Data Lamaran</option>
+                        <option value="penempatan">Data Penempatan</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-success" id="exportBtn">
+                    <i class="bi bi-file-earmark-spreadsheet"></i> Export Laporan
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm bg-light h-100">
+            <div class="card-body">
+                <h5 class="card-title">Informasi Laporan</h5>
+                <p class="card-text">Anda dapat mengunduh data sistem dalam bentuk laporan. Laporan yang dihasilkan akan memuat seluruh data yang terdaftar pada sistem berdasarkan jenis data yang dipilih.</p>
+                <ul>
+                    <li>Laporan dalam format yang mudah diakses.</li>
+                    <li>Digunakan untuk keperluan arsip dan monitoring.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('exportBtn').addEventListener('click', function() {
+        var type = document.getElementById('reportType').value;
+        var url = "{{ url_for('admin.laporan_export') }}?type=" + type;
+        window.location.href = url;
+    });
+</script>
+{% endblock %}

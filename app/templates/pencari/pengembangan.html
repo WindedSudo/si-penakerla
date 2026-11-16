@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Keahlian & Portofolio - SI-PENAKERLA{% endblock %}
+{% block content %}
+<div class="page-header mb-4">
+    <h2><i class="bi bi-stars me-2"></i>Keahlian & Portofolio</h2>
+    <p class="text-muted mb-0">Tampilkan kemampuan spesifik dan hasil pekerjaan agar perusahaan dapat menilai profil Anda dengan lebih lengkap.</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white"><h5 class="mb-0">Tambah Keahlian</h5></div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('pencari.skill_tambah') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label class="form-label" for="nama_skill">Nama skill</label>
+                        <input class="form-control" id="nama_skill" name="nama_skill" maxlength="100" required placeholder="Contoh: Microsoft Excel, AutoCAD, Pengelasan">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="kategori">Kategori</label>
+                        <input class="form-control" id="kategori" name="kategori" maxlength="60" placeholder="Contoh: Administrasi, Teknik, Digital">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-7 mb-3">
+                            <label class="form-label" for="tingkat">Tingkat penguasaan</label>
+                            <select class="form-select" id="tingkat" name="tingkat">
+                                {% for tingkat in tingkat_options %}<option value="{{ tingkat }}">{{ tingkat }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-5 mb-3">
+                            <label class="form-label" for="pengalaman_tahun">Pengalaman (tahun)</label>
+                            <input class="form-control" type="number" id="pengalaman_tahun" name="pengalaman_tahun" min="0" max="60" step="0.5" value="0">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary w-100" type="submit"><i class="bi bi-plus-circle me-1"></i>Tambah Skill</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white"><h5 class="mb-0">Daftar Keahlian Saya</h5></div>
+            <div class="card-body">
+                {% if keahlian_list %}
+                    {% for item in keahlian_list %}
+                    <div class="d-flex justify-content-between align-items-start border-bottom py-2">
+                        <div class="pe-2">
+                            <strong>{{ item.nama_skill }}</strong>
+                            <div class="small text-muted">{{ item.kategori or 'Umum' }} · {{ item.tingkat }} · {{ item.pengalaman_tahun }} tahun</div>
+                        </div>
+                        <form method="POST" action="{{ url_for('pencari.skill_hapus', skill_id=item.id) }}" onsubmit="return confirm('Hapus skill ini?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="btn btn-sm btn-outline-danger" title="Hapus"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                {% else %}<p class="text-muted mb-0">Belum ada skill terstruktur. Tambahkan skill yang sesuai kemampuan Anda.</p>{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white"><h5 class="mb-0">Tambah Portofolio</h5></div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('pencari.portofolio_tambah') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label class="form-label" for="judul">Judul karya/proyek</label>
+                        <input class="form-control" id="judul" name="judul" maxlength="150" required placeholder="Contoh: Website Toko Online, Desain Rumah 2 Lantai">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="deskripsi">Deskripsi dan peran Anda</label>
+                        <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Jelaskan tujuan proyek, kontribusi, teknologi/alat, dan hasilnya."></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label" for="tautan">Tautan karya (opsional)</label>
+                            <input class="form-control" id="tautan" name="tautan" type="url" maxlength="500" placeholder="https://github.com/username/proyek">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="tahun">Tahun</label>
+                            <input class="form-control" id="tahun" name="tahun" type="number" min="1950" max="{{ tahun_sekarang + 1 }}" placeholder="{{ tahun_sekarang }}">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" type="submit"><i class="bi bi-plus-circle me-1"></i>Simpan Portofolio</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white"><h5 class="mb-0">Portofolio Saya</h5></div>
+            <div class="card-body">
+                {% if portofolio_list %}
+                    {% for item in portofolio_list %}
+                    <div class="border-bottom py-3">
+                        <div class="d-flex justify-content-between gap-3">
+                            <div>
+                                <h6 class="fw-bold mb-1">{{ item.judul }} {% if item.tahun %}<span class="text-muted fw-normal">({{ item.tahun }})</span>{% endif %}</h6>
+                                {% if item.deskripsi %}<p class="text-muted small mb-1">{{ item.deskripsi }}</p>{% endif %}
+                                {% if item.tautan %}<a href="{{ item.tautan }}" target="_blank" rel="noopener noreferrer">Lihat karya <i class="bi bi-box-arrow-up-right"></i></a>{% endif %}
+                            </div>
+                            <form method="POST" action="{{ url_for('pencari.portofolio_hapus', portofolio_id=item.id) }}" onsubmit="return confirm('Hapus portofolio ini?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm btn-outline-danger" title="Hapus"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}<p class="text-muted mb-0">Belum ada portofolio. Tambahkan proyek, karya, atau hasil pekerjaan yang relevan.</p>{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mt-4"><a class="btn btn-outline-secondary" href="{{ url_for('pencari.cv_builder') }}"><i class="bi bi-file-earmark-person me-1"></i>Lihat CV Builder</a></div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Profil Perusahaan{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        Profil Perusahaan
+        {% if perusahaan.status_verifikasi == 'terverifikasi' %}
+        <span class="badge bg-success fs-6 ms-2 align-middle"><i class="bi bi-check-circle"></i> Terverifikasi</span>
+        {% elif perusahaan.status_verifikasi == 'ditolak' %}
+        <span class="badge bg-danger fs-6 ms-2 align-middle">Ditolak</span>
+        {% else %}
+        <span class="badge bg-warning text-dark fs-6 ms-2 align-middle">Belum Diverifikasi</span>
+        {% endif %}
+    </h2>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Edit Profil</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="mb-3">
+                        <label for="nama_perusahaan" class="form-label">Nama Perusahaan</label>
+                        <input type="text" class="form-control" id="nama_perusahaan" name="nama_perusahaan" value="{{ perusahaan.nama_perusahaan or '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="alamat" class="form-label">Alamat Lengkap</label>
+                        <textarea class="form-control" id="alamat" name="alamat" rows="3" required>{{ perusahaan.alamat or '' }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="kecamatan" class="form-label">Kecamatan</label>
+                        <select class="form-select" id="kecamatan" name="kecamatan" required>
+                            <option value="">-- Pilih Kecamatan --</option>
+                            {% for kec in kecamatan_options %}
+                            <option value="{{ kec }}" {% if perusahaan.kecamatan == kec %}selected{% endif %}>{{ kec }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email Perusahaan</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ perusahaan.email or '' }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="telepon" class="form-label">Nomor Telepon</label>
+                            <input type="text" class="form-control" id="telepon" name="telepon" value="{{ perusahaan.telepon or '' }}" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Simpan Profil</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Pratinjau Profil</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Nama Perusahaan</strong>
+                    <div class="text-muted">{{ perusahaan.nama_perusahaan or '-' }}</div>
+                </div>
+                <div class="mb-3">
+                    <strong>Email</strong>
+                    <div class="text-muted">{{ perusahaan.email or '-' }}</div>
+                </div>
+                <div class="mb-3">
+                    <strong>Telepon</strong>
+                    <div class="text-muted">{{ perusahaan.telepon or '-' }}</div>
+                </div>
+                <div class="mb-3">
+                    <strong>Kecamatan</strong>
+                    <div class="text-muted">{{ perusahaan.kecamatan or '-' }}</div>
+                </div>
+                <div class="mb-3">
+                    <strong>Alamat Lengkap</strong>
+                    <div class="text-muted">{{ perusahaan.alamat or '-' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
